@@ -44,4 +44,17 @@ TEST(DFSA, SimpleSequenceMatch)
     EXPECT_FALSE(machine.match("aabc"));
     EXPECT_FALSE(machine.match("abcd"));
     EXPECT_FALSE(machine.match("abcc"));
+    EXPECT_FALSE(machine.match("ab"));
+}
+
+TEST(DFSA, SimpleCompileRegex)
+{
+    using namespace automata;
+    dfsa machine{"abc"};
+
+    EXPECT_TRUE(machine.match("abc"));
+    EXPECT_FALSE(machine.match("aabc"));
+    EXPECT_FALSE(machine.match("abcd"));
+    EXPECT_FALSE(machine.match("abcc"));
+    EXPECT_FALSE(machine.match("ab"));
 }

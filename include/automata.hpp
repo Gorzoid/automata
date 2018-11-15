@@ -35,7 +35,10 @@ namespace automata
     //private:
         std::vector<node> nodes;
     public:
-        dfsa(const std::string& regular_expression);
+        dfsa(const std::string& regular_expression)
+        {
+            
+        }
         dfsa() = default;
 
         void addNode(node newNode)
