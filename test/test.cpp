@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <automata.hpp>
+#include <cstdio>
 
 TEST(DFSA, SimpleCyclicMatch)
 {
@@ -57,4 +58,25 @@ TEST(DFSA, SimpleCompileRegex)
     EXPECT_FALSE(machine.match("abcd"));
     EXPECT_FALSE(machine.match("abcc"));
     EXPECT_FALSE(machine.match("ab"));
+}
+
+TEST(DFSA, SimpleRepeatRegex)
+{
+    using namespace automata;
+    dfsa machine{"ab*c"};
+
+    EXPECT_TRUE(machine.match("abc"));
+    EXPECT_TRUE(machine.match("ac"));
+    EXPECT_TRUE(machine.match("abbbbc"));
+    EXPECT_FALSE(machine.match("acbbb"));
+    EXPECT_FALSE(machine.match("abcd"));
+    EXPECT_FALSE(machine.match("abcc"));
+    EXPECT_FALSE(machine.match("ab"));
+}
+
+int main(int argc, char **argv)
+{
+	  printf("Running main() from gtest_main.cc\n");
+	  testing::InitGoogleTest(&argc, argv);
+	  return RUN_ALL_TESTS();
 }
