@@ -6,12 +6,8 @@ TEST(DFSA, SimpleCyclicMatch)
 {
     using namespace automata;
     dfsa machine;
-    machine.addNode(dfsa::node{
-        {
-            {'a', 0}, // cyclic
-        },
-        true
-    });
+    machine.addTransition(0, 'a', 0);
+    machine.addFinalState(0);
 
     EXPECT_TRUE(machine.match("a"));
     EXPECT_TRUE(machine.match("aaaa"));
@@ -24,22 +20,11 @@ TEST(DFSA, SimpleSequenceMatch)
 {
     using namespace automata;
     dfsa machine;
-    machine.addNode(dfsa::node{
-        {
-            {'a', 1},
-        }
-    });
-    machine.addNode(dfsa::node{
-        {
-            {'b', 2},
-        }
-    });
-    machine.addNode(dfsa::node{
-        {
-            {'c', 3},
-        }
-    });
-    machine.addNode(dfsa::node{{}, true});
+    machine.addTransition(0, 'a', 1);
+    machine.addTransition(1, 'b', 2);
+    machine.addTransition(2, 'c', 3);
+    
+    machine.addFinalState(3);
 
     EXPECT_TRUE(machine.match("abc"));
     EXPECT_FALSE(machine.match("aabc"));
@@ -51,7 +36,7 @@ TEST(DFSA, SimpleSequenceMatch)
 TEST(DFSA, SimpleCompileRegex)
 {
     using namespace automata;
-    dfsa machine{"abc"};
+    dfsa machine = dfsa::compile_regex("abc");
 
     EXPECT_TRUE(machine.match("abc"));
     EXPECT_FALSE(machine.match("aabc"));
@@ -63,7 +48,7 @@ TEST(DFSA, SimpleCompileRegex)
 TEST(DFSA, SimpleRepeatRegex)
 {
     using namespace automata;
-    dfsa machine{"ab*c"};
+    dfsa machine = dfsa::compile_regex("ab*c");
 
     EXPECT_TRUE(machine.match("abc"));
     EXPECT_TRUE(machine.match("ac"));

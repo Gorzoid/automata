@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <algorithm>
 #include <iostream>
 
@@ -8,57 +9,30 @@ namespace automata
 {
     class dfsa
     {
-    public: // temporary public everything so we can test smaller features.
-        struct node
+        struct pair_hasher
         {
-            std::unordered_map<char, int> mapping; // mapping from char to index in dfsa::nodes
-            bool finalState;
-            node(std::unordered_map<char, int> _mapping, bool _finalState = false)
-                : mapping(std::move(_mapping)), finalState(_finalState)
+            template<typename T1, typename T2>
+            std::size_t operator()(const std::pair<T1,T2>& p) const
             {
-
-            }
-
-            int transition(char c) const
-            {
-                auto it = mapping.find(c);
-                if(it == mapping.end()) return -1;
-                return it->second;
+                std::size_t hash = std::hash<T1>{}(p.first);
+                return hash ^ (std::hash<T2>{}(p.second) + 0x9e3779b9 + (hash<<6) + (hash>>2));
             }
         };
 
     //private:
-        std::vector<node> nodes;
+        std::unordered_map<std::pair<int,char>,int,pair_hasher> m_transitions;
+        std::unordered_set<int> m_finalStates;
+        int m_initialState = 0;
     public:
-        dfsa(const std::string& regular_expression)
-        {
-            for(char c : regular_expression)
-            {
-                nodes.emplace_back(std::unordered_map<char,int>{{c, nodes.size()+1}},false);
-            }
-            nodes.emplace_back(std::unordered_map<char,int>{},true);
-        }
         dfsa() = default;
 
-        void addNode(node newNode)
-        {
-            nodes.push_back(std::move(newNode));
-        }
+        void addTransition(int fromState, char c, int toState);
+        void removeTransition(int fromState, char c);
+        void addFinalState(int state);
 
-        bool match(const std::string& str)
-        {
-            if(nodes.empty()) return false; // Empty state machine never matches
+        bool match(const std::string& input) const;
 
-            int state = 0;
-            for(char c : str)
-            {
-                int nextState = nodes[state].transition(c); // Get next node given action
-                if(nextState >= nodes.size() || nextState < 0)
-                    return false;
-                state = nextState;
-            };
-
-            return nodes[state].finalState;
-        }
+        static dfsa compile_regex(const std::string& pattern);
     };
+
 }
