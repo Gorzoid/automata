@@ -45,7 +45,7 @@ TEST(DFSA, SimpleCompileRegex)
     EXPECT_FALSE(machine.match("ab"));
 }
 
-TEST(DFSA, SimpleRepeatRegex)
+TEST(DFSA, SimpleRepeatStarRegex)
 {
     using namespace automata;
     dfsa machine = dfsa::compile_regex("ab*c");
@@ -59,9 +59,25 @@ TEST(DFSA, SimpleRepeatRegex)
     EXPECT_FALSE(machine.match("ab"));
 }
 
-int main(int argc, char **argv)
+TEST(DFSA, SimpleRepeatPlusRegex)
 {
-	  printf("Running main() from gtest_main.cc\n");
+    using namespace automata;
+    dfsa machine = dfsa::compile_regex("ab+c");
+
+    EXPECT_TRUE(machine.match("abc"));
+    EXPECT_FALSE(machine.match("ac"));
+    EXPECT_TRUE(machine.match("abbbbc"));
+    EXPECT_FALSE(machine.match("acbbb"));
+    EXPECT_FALSE(machine.match("abcd"));
+    EXPECT_FALSE(machine.match("abcc"));
+    EXPECT_FALSE(machine.match("ab"));
+}
+
+/* Explicit main function to allow for quicker debugging */
+
+/*int main(int argc, char **argv)
+{
+	  printf("Running main() from test.cpp\n");
 	  testing::InitGoogleTest(&argc, argv);
 	  return RUN_ALL_TESTS();
-}
+}*/
