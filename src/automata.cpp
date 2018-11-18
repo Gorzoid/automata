@@ -2,6 +2,19 @@
 namespace automata
 {
 
+    void dfsa::addTransition(int fromState, char c, int toState)
+    {
+        m_transitions[{fromState, c}] = toState;
+    }
+    void dfsa::removeTransition(int fromState, char c)
+    {
+        m_transitions.erase({fromState, c});
+    }
+    void dfsa::addFinalState(int state)
+    {
+        m_finalStates.insert(state);
+    }
+
     bool dfsa::match(const std::string& str) const
     {
         int state = m_initialState;
@@ -13,7 +26,7 @@ namespace automata
             state = it->second;
         };
 
-        return m_finalStates.count(state);
+        return m_finalStates.count(state)==1;
     }
 
     dfsa dfsa::compile_regex(const std::string& pattern)
