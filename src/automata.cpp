@@ -77,13 +77,11 @@ namespace automata
                     m_transitions[{f,p.first.second}] = p.second;
                 }
             }
-            else
-            {
-                m_transitions[{p.first.first,p.first.second}] = p.second;
-            }
+            m_transitions[{p.first.first,p.first.second}] = p.second;
         }
         
-        m_finalStates.clear();
+        if(machine.m_finalStates.count(s) == 0) // Keep original contents only if initial state is also final state 
+            m_finalStates.clear();
         std::transform(
             machine.m_finalStates.begin(),
             machine.m_finalStates.end(),

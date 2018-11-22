@@ -24,6 +24,7 @@ namespace automata
         std::unordered_set<int> m_finalStates;
         int m_initialState = 0;
         int m_maxStates = 0;
+
     public:
         dfsa() = default;
 

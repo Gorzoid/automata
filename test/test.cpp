@@ -108,6 +108,19 @@ TEST(DFSA, CombineRegex2)
 TEST(DFSA, CombineRegex3)
 {
     using namespace automata;
+    dfsa machine = dfsa::compile_regex("ab*") + dfsa::compile_regex("c");
+
+    EXPECT_TRUE(machine.match("abc"));
+    EXPECT_TRUE(machine.match("ac"));
+    EXPECT_TRUE(machine.match("abbc"));
+    EXPECT_FALSE(machine.match("ab"));
+    EXPECT_FALSE(machine.match("bc"));
+    EXPECT_FALSE(machine.match("bb"));
+}
+
+TEST(DFSA, CombineRegex4)
+{
+    using namespace automata;
     dfsa machine = dfsa::compile_regex("ab*") + dfsa::compile_regex("c*");
 
     EXPECT_TRUE(machine.match("abc"));
