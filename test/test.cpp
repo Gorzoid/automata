@@ -73,6 +73,52 @@ TEST(DFSA, SimpleRepeatPlusRegex)
     EXPECT_FALSE(machine.match("ab"));
 }
 
+TEST(DFSA, CombineRegex)
+{
+    using namespace automata;
+    dfsa machine = dfsa::compile_regex("ab*c");
+
+    machine += dfsa::compile_regex("ab+c");
+
+    EXPECT_TRUE(machine.match("abcabc"));
+    EXPECT_TRUE(machine.match("acabc"));
+    EXPECT_TRUE(machine.match("abbbbcabc"));
+    EXPECT_FALSE(machine.match("acbbbabc"));
+    EXPECT_FALSE(machine.match("abcdabc"));
+    EXPECT_FALSE(machine.match("abccab"));
+    EXPECT_FALSE(machine.match("abc"));
+    EXPECT_TRUE(machine.match("abbbcabbbc"));
+    EXPECT_TRUE(machine.match("acabbbc"));
+    EXPECT_FALSE(machine.match("acac"));
+}
+
+TEST(DFSA, CombineRegex2)
+{
+    using namespace automata;
+    dfsa machine = dfsa::compile_regex("ab") + dfsa::compile_regex("c*");
+
+    EXPECT_TRUE(machine.match("abc"));
+    EXPECT_TRUE(machine.match("ab"));
+    EXPECT_TRUE(machine.match("abcc"));
+    EXPECT_FALSE(machine.match("ac"));
+    EXPECT_FALSE(machine.match("bc"));
+    EXPECT_FALSE(machine.match("c"));
+}
+
+TEST(DFSA, CombineRegex3)
+{
+    using namespace automata;
+    dfsa machine = dfsa::compile_regex("ab*") + dfsa::compile_regex("c*");
+
+    EXPECT_TRUE(machine.match("abc"));
+    EXPECT_TRUE(machine.match("a"));
+    EXPECT_TRUE(machine.match("abb"));
+    EXPECT_TRUE(machine.match("acc"));
+    EXPECT_TRUE(machine.match("abbcc"));
+    EXPECT_FALSE(machine.match("acb"));
+    EXPECT_FALSE(machine.match("bc"));
+}
+
 /* Explicit main function to allow for quicker debugging */
 
 /*int main(int argc, char **argv)

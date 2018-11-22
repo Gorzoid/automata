@@ -19,10 +19,11 @@ namespace automata
             }
         };
 
-    //private:
+    private:
         std::unordered_map<std::pair<int,char>,int,pair_hasher> m_transitions;
         std::unordered_set<int> m_finalStates;
         int m_initialState = 0;
+        int m_maxStates = 0;
     public:
         dfsa() = default;
 
@@ -31,8 +32,11 @@ namespace automata
         void addFinalState(int state);
 
         bool match(const std::string& input) const;
+        
+        dfsa& operator+=(const dfsa& machine);
+
+        friend dfsa operator+(dfsa machine1, const dfsa& machine2);
 
         static dfsa compile_regex(const std::string& pattern);
     };
-
 }
