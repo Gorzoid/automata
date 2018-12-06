@@ -1,5 +1,6 @@
 #include <automata.hpp>
 #include <functional>
+#include <iterator>
 namespace automata
 {
 
@@ -94,7 +95,18 @@ namespace automata
 
     dfsa operator+(dfsa machine1, const dfsa& machine2)
     {
-        machine1 += machine2;
+        machine1 += machine2; // pass by copy so this doesn't affect pass argument
+        return machine1;
+    }
+
+    dfsa& dfsa::operator|=(const dfsa& machine)
+    {
+
+    }
+
+    dfsa operator|(dfsa machine1, const dfsa& machine2)
+    {
+        machine1 |= machine2; // pass by copy so this doesn't affect pass argument
         return machine1;
     }
 

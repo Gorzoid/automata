@@ -132,6 +132,46 @@ TEST(DFSA, CombineRegex4)
     EXPECT_FALSE(machine.match("bc"));
 }
 
+TEST(DFSA, CombineIdentity1)
+{
+    using namespace automata;
+    dfsa machine = dfsa::compile_regex("ab");
+
+    dfsa machine2 = machine + dfsa::compile_regex("");
+    dfsa machine3 = dfsa::compile_regex("") + machine;
+
+    EXPECT_EQ(machine.match("ab"),  machine2.match("ab")); // TRUE
+    EXPECT_EQ(machine.match("ab"),  machine3.match("ab")); // TRUE
+
+    EXPECT_EQ(machine.match("abc"), machine2.match("abc")); // FALSE
+    EXPECT_EQ(machine.match("abc"), machine3.match("abc")); // FALSE
+
+    EXPECT_EQ(machine.match("a"),   machine2.match("a")); // FALSE
+    EXPECT_EQ(machine.match("a"),   machine3.match("a")); // FALSE
+
+}
+
+TEST(DFSA, CombineIdentity2)
+{
+    using namespace automata;
+    dfsa machine = dfsa::compile_regex("ab*");
+
+    dfsa machine2 = machine + dfsa::compile_regex("");
+    dfsa machine3 = dfsa::compile_regex("") + machine;
+
+    EXPECT_EQ(machine.match("ab"),  machine2.match("ab")); // TRUE
+    EXPECT_EQ(machine.match("ab"),  machine3.match("ab")); // TRUE
+
+    EXPECT_EQ(machine.match("abc"), machine2.match("abc")); // FALSE
+    EXPECT_EQ(machine.match("abc"), machine3.match("abc")); // FALSE
+
+    EXPECT_EQ(machine.match("a"),   machine2.match("a")); // TRUE
+    EXPECT_EQ(machine.match("a"),   machine3.match("a")); // TRUE
+
+    EXPECT_EQ(machine.match("abb"),   machine2.match("abb")); // TRUE
+    EXPECT_EQ(machine.match("abb"),   machine3.match("abb")); // TRUE
+}
+
 /* Explicit main function to allow for quicker debugging */
 
 /*int main(int argc, char **argv)

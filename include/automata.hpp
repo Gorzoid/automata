@@ -35,8 +35,10 @@ namespace automata
         bool match(const std::string& input) const;
         
         dfsa& operator+=(const dfsa& machine);
+        dfsa& operator|=(const dfsa& machine);
 
         friend dfsa operator+(dfsa machine1, const dfsa& machine2);
+        friend dfsa operator|(dfsa machine1, const dfsa& machine2);
 
         static dfsa compile_regex(const std::string& pattern);
     };
