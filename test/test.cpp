@@ -2,7 +2,7 @@
 #include <automata.hpp>
 #include <cstdio>
 
-TEST(DFSA, SimpleCyclicMatch)
+TEST(DFSA, SimpleConstruction1)
 {
     using namespace automata;
     dfsa machine;
@@ -16,7 +16,7 @@ TEST(DFSA, SimpleCyclicMatch)
 }
 
 
-TEST(DFSA, SimpleSequenceMatch)
+TEST(DFSA, SimpleConstruction2)
 {
     using namespace automata;
     dfsa machine;
@@ -33,10 +33,10 @@ TEST(DFSA, SimpleSequenceMatch)
     EXPECT_FALSE(machine.match("ab"));
 }
 
-TEST(DFSA, SimpleCompileRegex)
+TEST(DFSA, SimpleSequence1)
 {
     using namespace automata;
-    dfsa machine = dfsa::compile_regex("abc");
+    dfsa machine = dfsa::sequence("abc");
 
     EXPECT_TRUE(machine.match("abc"));
     EXPECT_FALSE(machine.match("aabc"));
@@ -45,53 +45,96 @@ TEST(DFSA, SimpleCompileRegex)
     EXPECT_FALSE(machine.match("ab"));
 }
 
-TEST(DFSA, SimpleRepeatStarRegex)
+TEST(DFSA, SimpleSequence2)
 {
     using namespace automata;
-    dfsa machine = dfsa::compile_regex("ab*c");
+    dfsa machine = dfsa::sequence("a");
 
-    EXPECT_TRUE(machine.match("abc"));
-    EXPECT_TRUE(machine.match("ac"));
-    EXPECT_TRUE(machine.match("abbbbc"));
-    EXPECT_FALSE(machine.match("acbbb"));
-    EXPECT_FALSE(machine.match("abcd"));
-    EXPECT_FALSE(machine.match("abcc"));
+    EXPECT_TRUE(machine.match("a"));
+    EXPECT_FALSE(machine.match("aa"));
+    EXPECT_FALSE(machine.match(""));
     EXPECT_FALSE(machine.match("ab"));
+    EXPECT_FALSE(machine.match("b"));
 }
 
-TEST(DFSA, SimpleRepeatPlusRegex)
+TEST(DFSA, SimpleKleeneStar)
 {
     using namespace automata;
-    dfsa machine = dfsa::compile_regex("ab+c");
+    dfsa machine = dfsa::sequence("a");
+    machine.plus();
+
+    EXPECT_TRUE(machine.match("a"));
+    EXPECT_TRUE(machine.match("aa"));
+    EXPECT_TRUE(machine.match("aaa"));
+    EXPECT_FALSE(machine.match(""));
+    EXPECT_FALSE(machine.match("ab"));
+    EXPECT_FALSE(machine.match("ba"));
+    EXPECT_FALSE(machine.match("aab"));
+}
+
+TEST(DFSA, SimpleKleenePlus)
+{
+    using namespace automata;
+    dfsa machine = dfsa::sequence("a");
+    machine.star();
+
+    EXPECT_TRUE(machine.match("a"));
+    EXPECT_TRUE(machine.match("aa"));
+    EXPECT_TRUE(machine.match("aaa"));
+    EXPECT_TRUE(machine.match(""));
+    EXPECT_FALSE(machine.match("ab"));
+    EXPECT_FALSE(machine.match("ba"));
+    EXPECT_FALSE(machine.match("aab"));
+}
+
+TEST(DFSA, SequenceKleeneStar)
+{
+    using namespace automata;
+    dfsa machine = dfsa::sequence("abc");
+    machine.plus();
 
     EXPECT_TRUE(machine.match("abc"));
-    EXPECT_FALSE(machine.match("ac"));
-    EXPECT_TRUE(machine.match("abbbbc"));
-    EXPECT_FALSE(machine.match("acbbb"));
-    EXPECT_FALSE(machine.match("abcd"));
-    EXPECT_FALSE(machine.match("abcc"));
+    EXPECT_TRUE(machine.match("abcabc"));
+    EXPECT_TRUE(machine.match("abcabcabc"));
+    EXPECT_FALSE(machine.match(""));
     EXPECT_FALSE(machine.match("ab"));
+    EXPECT_FALSE(machine.match("ba"));
+    EXPECT_FALSE(machine.match("aab"));
+}
+
+TEST(DFSA, SequenceKleenePlus)
+{
+    using namespace automata;
+    dfsa machine = dfsa::sequence("abc");
+    machine.star();
+
+    EXPECT_TRUE(machine.match("abc"));
+    EXPECT_TRUE(machine.match("abcabc"));
+    EXPECT_TRUE(machine.match("abcabcabc"));
+    EXPECT_TRUE(machine.match(""));
+    EXPECT_FALSE(machine.match("abcab"));
+    EXPECT_FALSE(machine.match("bcabc"));
+    EXPECT_FALSE(machine.match("abcacc"));
 }
 
 TEST(DFSA, CombineRegex)
 {
     using namespace automata;
-    dfsa machine = dfsa::compile_regex("ab*c");
+    dfsa machine = dfsa::sequence("a");
+    machine.star(); // a*
 
-    machine += dfsa::compile_regex("ab+c");
+    machine += dfsa::sequence("b"); // a*b
 
-    EXPECT_TRUE(machine.match("abcabc"));
-    EXPECT_TRUE(machine.match("acabc"));
-    EXPECT_TRUE(machine.match("abbbbcabc"));
-    EXPECT_FALSE(machine.match("acbbbabc"));
-    EXPECT_FALSE(machine.match("abcdabc"));
-    EXPECT_FALSE(machine.match("abccab"));
-    EXPECT_FALSE(machine.match("abc"));
-    EXPECT_TRUE(machine.match("abbbcabbbc"));
-    EXPECT_TRUE(machine.match("acabbbc"));
-    EXPECT_FALSE(machine.match("acac"));
+    EXPECT_TRUE(machine.match("ab"));
+    EXPECT_TRUE(machine.match("aab"));
+    EXPECT_TRUE(machine.match("b"));
+    EXPECT_FALSE(machine.match(""));
+    EXPECT_FALSE(machine.match("bb"));
+    EXPECT_FALSE(machine.match("abb"));
+    EXPECT_FALSE(machine.match("aac"));
+    EXPECT_TRUE(machine.match("aaab"));
 }
-
+/*
 TEST(DFSA, CombineRegex2)
 {
     using namespace automata;
@@ -170,7 +213,7 @@ TEST(DFSA, CombineIdentity2)
 
     EXPECT_EQ(machine.match("abb"),   machine2.match("abb")); // TRUE
     EXPECT_EQ(machine.match("abb"),   machine3.match("abb")); // TRUE
-}
+}*/
 
 /* Explicit main function to allow for quicker debugging */
 

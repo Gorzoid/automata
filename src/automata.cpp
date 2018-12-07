@@ -18,6 +18,49 @@ namespace automata
         m_finalStates.insert(state);
     }
 
+    void dfsa::plus()
+    {
+        /// TODO:
+        // This intially seems simple enough. Just attach finals states back to the initial state
+        // However we face a problem if the final state and initial state share a transition symbol
+        // For now we will have to ignore this, but we will need to make a function that basically
+        // propagates through a DFSA to resolve any of these conflicts
+
+        // No easy way to find transitions when we only have fromState, so loop through each one.
+        for(auto p : m_transitions)
+        {
+            if(p.first.first == m_initialState)
+            {
+                for(auto f : m_finalStates)
+                    addTransition(f, p.first.second, p.second); // Can now loop back to restart state. Final states remain the same
+            }
+        }
+    }
+
+    void dfsa::star()
+    {
+        // Naive solution is to set m_initialState to a final state and call plus()
+        // However if there are non final transitions to m_initialState
+        // then this would cause undesired behaviour
+        // This means we need to make a new initial state and mimic the original one
+
+        // TODO:
+        // We also face problems similar to the one addressed in dfsa::plus()
+
+        int st = m_maxStates++;
+        for(auto p : m_transitions)
+        {
+            if(p.first.first == m_initialState)
+            {
+                addTransition(st, p.first.second, p.second);
+            }
+        }
+
+        m_initialState = st;
+
+        plus(); // Avoid repeating code
+    }
+
     bool dfsa::match(const std::string& str) const
     {
         int state = m_initialState;
@@ -32,33 +75,14 @@ namespace automata
         return m_finalStates.count(state)==1;
     }
 
-    dfsa dfsa::compile_regex(const std::string& pattern)
+    dfsa dfsa::sequence(const std::string& str)
     {
         dfsa machine;
-        int currentState = 0;
-        char lastChar;
-        for(char c : pattern)
+        for(int i = 0; i < str.size(); ++i)
         {
-            if(c == '+' && currentState != 0)
-            {
-                machine.addTransition(currentState, lastChar, currentState); // Let this state loop back to itself if given lastChar again
-            }
-            else if(c == '*' && currentState != 0)
-            {
-                currentState--;
-                machine.removeTransition(currentState, lastChar); // Remove last transition because lastChar just leads back to itself.
-                machine.addTransition(currentState, lastChar, currentState);
-            }
-            else
-            {
-                machine.addTransition(currentState, c, currentState+1);
-                currentState++;
-            }
-            lastChar = c;
+            machine.addTransition(i, str[i], i+1);
         }
-
-        machine.addFinalState(currentState);
-
+        machine.addFinalState(str.size());
         return machine;
     }
 

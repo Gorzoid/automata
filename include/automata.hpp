@@ -32,6 +32,11 @@ namespace automata
         void removeTransition(int fromState, char c);
         void addFinalState(int state);
 
+        // plus():
+        // Modifies the DFSA to allow for 1 or more matches
+        void plus();
+        void star();
+
         bool match(const std::string& input) const;
         
         dfsa& operator+=(const dfsa& machine);
@@ -40,6 +45,6 @@ namespace automata
         friend dfsa operator+(dfsa machine1, const dfsa& machine2);
         friend dfsa operator|(dfsa machine1, const dfsa& machine2);
 
-        static dfsa compile_regex(const std::string& pattern);
+        static dfsa sequence(const std::string& str);
     };
 }
